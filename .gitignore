@@ -1,0 +1,33 @@
+# Golang binary and build output
+*.exe
+*.out
+*.a
+*.so
+bin/
+build/
+
+# Vendor directory
+vendor/
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+
+# Test coverage
+coverage/
+*.cov
+
+# .env files
+.env
