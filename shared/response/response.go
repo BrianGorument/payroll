@@ -9,7 +9,6 @@ import (
 
 // Response model
 type Response struct {
-	ResponseCode       string      `json:"rc"`
 	Description        string      `json:"desc"`
 	Message            string      `json:"msg"`
 	MessageDescription string      `json:"msg_desc"`
@@ -19,7 +18,6 @@ type Response struct {
 // SendSuccessResponse mengirimkan response sukses
 func SendSuccessResponse(ctx *gin.Context, data interface{}) {
 	resp := Response{
-		ResponseCode:       RCSuccess,
 		Description:        DescriptionSuccess,
 		Message:            DataSuccess,
 		MessageDescription: DataSuccessDesc,
@@ -43,7 +41,6 @@ func ErrorHandler(ctx *gin.Context, logger *logrus.Logger, req interface{}, err 
 
 	resp := ErrorStruct{
 		HTTPCode:           http.StatusInternalServerError,
-		Code:               RCServerError,
 		Description:        DescriptionFailed,
 		Message:            ServerError,
 		MessageDescription: ServerErrorDesc,

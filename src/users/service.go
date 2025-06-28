@@ -4,9 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"payroll/shared/utils"
-	"time"
-
-	"github.com/go-playground/validator/v10"
 )
 
 // userService struct
@@ -19,41 +16,6 @@ func NewUserService(repo IUserRepository) IUserService {
 	return &userService{repo}
 }
 
-// Implementasi UserService
-func (s *userService) RegisterUser(req CreateUserRequest) (*UserResponse, error) {
-	existingUsers, _ := s.repo.FindAll()
-	for _, u := range existingUsers {
-		if u.Email == req.Email {
-			return nil, errors.New("email already registered")
-		}
-	}
-	hashedPassword, _ := utils.HashPassword(req.Password)
-	validate := validator.New()
-	err := validate.Var(req.Email, "required,email")
-	if err != nil {
-		fmt.Println("Invalid email:", err)
-		return nil, errors.New("invalid Email Format")
-	}
-
-	timenow := time.Now()
-
-	user := User{
-		Username:  req.Username,
-		Email:     req.Email,
-		Password:  hashedPassword,
-		Role_code: req.Role_code,
-		FirstName: req.FirstName,
-		LastName:  req.LastName,
-		CreatedAt: timenow,
-		UpdatedAt: timenow,
-	}
-	err = s.repo.Create(&user)
-	if err != nil {
-		return nil, err
-	}
-
-	return &UserResponse{ID: user.ID, Username: user.Username, Email: user.Email}, nil
-}
 
 func (s *userService) GetAllUsers() ([]UserResponse, error) {
 	users, err := s.repo.FindAll()
@@ -66,22 +28,36 @@ func (s *userService) GetAllUsers() ([]UserResponse, error) {
 		userResponses = append(userResponses, UserResponse{
 			ID:       user.ID,
 			Username: user.Username,
-			Email:    user.Email,
 		})
 	}
 
 	return userResponses, nil
 }
 
-func (s *userService) LoginUser(req CreateUserRequest) (*UserResponse, error) {
+func (s *userService) LoginUser(req UserLoginRequest) (*UserResponse, error) {
+	eu, err := s.repo.FindByUsername(req.Username)
+	if err != nil {
+		return nil, err
+	}	
+	verifiedPassword :=  utils.VerifyPassword(req.Password, eu.Password,)
+	
+	if !verifiedPassword {
+		return nil, errors.New("invalid password")
+	}
+	
+	token, err := utils.CreateJWTToken(eu.ID, eu.Username , eu.Role)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate token: %v", err)
+	}
+	
 	existingUsers, _ := s.repo.FindAll()
 	for _, u := range existingUsers {
-		if u.Email == req.Email {
+		if u.Username == req.Username {
 			return &UserResponse{
 				ID:       u.ID,
 				Username: u.Username,
-				Email:    u.Email,
-			}, nil
+				Token: token,
+			},  nil
 		}
 	}
 

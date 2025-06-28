@@ -25,9 +25,18 @@ func (r *userRepository) FindAll() ([]User, error) {
 	return users, err
 }
 
-func (r *userRepository) FindByID(id uint) (*User, error) {
+func (r *userRepository) FindByUUID(id int) (*User, error) {
 	var user User
 	err := r.db.First(&user, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *userRepository) FindByUsername(username string) (*User, error) {
+	var user User
+	err := r.db.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
