@@ -8,6 +8,7 @@ import (
 	"payroll/logger"
 	"payroll/shared/utils"
 	"payroll/src/attendances"
+	"payroll/src/overtimes"
 	"payroll/src/payroll_periods"
 	"payroll/src/users"
 
@@ -38,6 +39,7 @@ func main() {
 	users.RegisterRoutes(router, db, log)
 	payroll_periods.RegisterRoutes(router, db, log)
 	attendances.RegisterRoutes(router, db, log)
+	overtimes.RegisterRoutes(router, db, log)
 
 	// Start Server
 	port := ":8888"
