@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"payroll/shared/utils"
+	"strconv"
 )
 
 // userService struct
@@ -45,7 +46,9 @@ func (s *userService) LoginUser(req UserLoginRequest) (*UserResponse, error) {
 		return nil, errors.New("invalid password")
 	}
 	
-	token, err := utils.CreateJWTToken(eu.ID, eu.Username , eu.Role)
+	stringid := strconv.Itoa(eu.ID)
+	
+	token, err := utils.CreateJWTToken(stringid, eu.Username , eu.Role)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate token: %v", err)
 	}

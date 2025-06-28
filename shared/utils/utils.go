@@ -23,11 +23,11 @@ func getJwtSecret() []byte {
 	}
 	return []byte(jwtSecret)
 }
-func CreateJWTToken(userID int ,userName string , role string) (string, error) {
+func CreateJWTToken(userID string ,userName string , role string) (string, error) {
 
 	// Generate JWT token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userId":    userID,
+		"userid":    userID,
 		"userName":  userName,
 		"role":      role,
 		"exp"  :  time.Now().Add(time.Hour * 1).Unix(),
@@ -39,23 +39,29 @@ func CreateJWTToken(userID int ,userName string , role string) (string, error) {
 }
 
 func ValidateToken(tokenStr string) (jwt.MapClaims, error) {
-	jwtSecret := getJwtSecret()
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method")
-		}
-		return jwtSecret, nil
-	})
-	if err != nil || !token.Valid {
-		return nil, err
-	}
+    jwtSecret := getJwtSecret()
+    token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+            return nil, fmt.Errorf("unexpected signing method")
+        }
+        return jwtSecret, nil
+    })
+    if err != nil || !token.Valid {
+        return nil, errors.New("invalid or expired token")
+    }
 
-	// Extract claims
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return claims, nil
-	}
-	return nil, errors.New("invalid token")
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if !ok || !token.Valid {
+        return nil, errors.New("invalid token claims")
+    }
+
+    if userid, ok := claims["userid"].(string); !ok || userid == "" {
+        return nil, errors.New("missing or invalid user ID in token")
+    }
+
+    return claims, nil
 }
+
 
 
 func ConvertToUint(value interface{}) (uint, error) {

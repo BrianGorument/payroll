@@ -1,6 +1,8 @@
 package users
 
 import (
+	"payroll/shared/utils"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -16,8 +18,7 @@ func RegisterRoutes(router *gin.Engine, db *gorm.DB, log *logrus.Logger) {
 	{
 		usersGroup := routersGroup.Group("users")
 
-		usersGroup.GET("/", handler.GetAllUsers)
-	//	usersGroup.POST("/register", handler.RegisterUser)
+		usersGroup.GET("/", utils.JWTAuthMiddleware(), handler.GetAllUsers)
 		usersGroup.POST("/login", handler.LoginUser)
 	}
 }

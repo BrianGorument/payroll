@@ -44,7 +44,7 @@ func (h *PayrollPeriodHandler) CreatePayrollPeriod(c *gin.Context) {
         return
     }
 
-    userID, exists := c.Get("userId")
+    userID, exists := c.Get("userid")
     if !exists {
         resp := response.ErrorStruct{
             HTTPCode:           http.StatusUnauthorized,

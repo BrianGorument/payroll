@@ -31,7 +31,6 @@ func main() {
 	// Initialize Gin Router
 	router := gin.Default()
 	
-	router.Use(utils.JWTAuthMiddleware()) 
     router.Use(utils.AuditLogMiddleware(db))
 
 	// Register User Routes
