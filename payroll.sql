@@ -34,11 +34,16 @@ CREATE TABLE "attendances" (
   "id" SERIAL PRIMARY KEY,
   "user_id" INT NOT NULL,
   "payroll_period_id" INT NOT NULL,
-  "attendance_date" date NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "check_in" TIMESTAMP NOT NULL,
+  "check_out" TIMESTAMP,
+  "check_in_date" DATE NOT NULL,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (now()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (now()),
   "created_by" INT NOT NULL,
-  "updated_by" INT NOT NULL
+  "updated_by" INT NOT NULL,
+  CONSTRAINT fk_user_id FOREIGN KEY ("user_id") REFERENCES "users" ("id"),
+  CONSTRAINT fk_payroll_period_id FOREIGN KEY ("payroll_period_id") REFERENCES "payroll_periods" ("id"),
+  CONSTRAINT unique_check_in_per_user_per_day UNIQUE ("user_id", "payroll_period_id", "check_in_date")
 );
 
 
