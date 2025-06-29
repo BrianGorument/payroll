@@ -10,6 +10,7 @@ import (
 	"payroll/src/attendances"
 	"payroll/src/overtimes"
 	"payroll/src/payroll_periods"
+	"payroll/src/reimbursements"
 	"payroll/src/users"
 
 	"github.com/gin-gonic/gin"
@@ -40,6 +41,8 @@ func main() {
 	payroll_periods.RegisterRoutes(router, db, log)
 	attendances.RegisterRoutes(router, db, log)
 	overtimes.RegisterRoutes(router, db, log)
+	reimbursements.RegisterRoutes(router, db, log)
+	payslips.RegisterRoutes(router, db, log)
 
 	// Start Server
 	port := ":8888"

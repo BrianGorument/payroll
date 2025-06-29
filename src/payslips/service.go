@@ -56,10 +56,9 @@ func (s *payslipService) RunPayroll(req RunPayrollRequest, adminID string) ([]Pa
     }
 
     var payslips []PayslipResponse
-    const overtimeRate = 50000.0 // Rp50,000 per jam (asumsikan)
 
     for _, user := range users {
-        // Hitung overtime_pay
+        // Hitung overtime_pay: 2 x gaji prorata per jam
         overtimes, err := s.repo.FindOvertimeByUserAndPeriod(user.ID, req.PayrollPeriodID)
         if err != nil {
             return nil, err
@@ -68,6 +67,8 @@ func (s *payslipService) RunPayroll(req RunPayrollRequest, adminID string) ([]Pa
         for _, ot := range overtimes {
             totalOvertimeHours += ot.Hours
         }
+        // Gaji prorata per jam = base_salary / (20 hari * 8 jam)
+        overtimeRate := (user.BaseSalary / 160.0) * 2
         overtimePay := float64(totalOvertimeHours) * overtimeRate
 
         // Hitung reimbursement_pay
