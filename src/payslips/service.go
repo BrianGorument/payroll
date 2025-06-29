@@ -153,6 +153,7 @@ func (s *payslipService) GeneratePayslip(req GeneratePayslipRequest, userID, rol
         return "", errors.New("invalid payroll_period_id format, must be a valid integer")
     }
 
+    // Tentukan user_id berdasarkan role
     targetUserID := userID
     if role == "admin" {
         if req.UserID == "" {
@@ -186,20 +187,42 @@ func (s *payslipService) GeneratePayslip(req GeneratePayslipRequest, userID, rol
         return "", err
     }
 
+    // Ambil data absensi
     attendances, err := s.repo.FindAttendanceByUserAndPeriod(targetUserID, req.PayrollPeriodID)
     if err != nil {
         return "", err
     }
 
+    // Ambil data lembur
     overtimes, err := s.repo.FindOvertimeByUserAndPeriod(targetUserID, req.PayrollPeriodID)
     if err != nil {
         return "", err
     }
 
+    // Ambil data reimbursement
     reimbursements, err := s.repo.FindReimbursementByUserAndPeriod(targetUserID, req.PayrollPeriodID)
     if err != nil {
         return "", err
     }
+
+    // Hitung salary_base_on_attended
+    var validAttendanceDays int
+    for _, att := range attendances {
+        if !att.CheckOut.IsZero() {
+            checkInDate := att.CheckIn.Truncate(24 * time.Hour)
+            checkOutDate := att.CheckOut.Truncate(24 * time.Hour)
+            if checkInDate.Equal(checkOutDate) {
+                checkIn := att.CheckIn.Truncate(time.Minute)
+                checkOut := att.CheckOut.Truncate(time.Minute)
+                durationHours := checkOut.Sub(checkIn).Hours()
+                if durationHours >= 8 {
+                    validAttendanceDays++
+                }
+            }
+        }
+    }
+    dailySalary := user.Salary / 20.0
+    salaryBaseOnAttended := float64(validAttendanceDays) * dailySalary
 
     // Buat folder tmp/payslips jika belum ada
     outputDir := "tmp/payslips"
@@ -211,14 +234,18 @@ func (s *payslipService) GeneratePayslip(req GeneratePayslipRequest, userID, rol
     pdfFileName := fmt.Sprintf("payslip_%s_%s.pdf", targetUserID, req.PayrollPeriodID)
     pdfFilePath := filepath.Join(outputDir, pdfFileName)
 
-    // Generate HTML template untuk PDF
-    htmlContent, err := GeneratePayslipHTML(user, period, payslip, attendances, overtimes, reimbursements)
-    if err != nil {
-        return "", err
-    }
 
-    // Generate PDF dari HTML
-    err = GeneratePDF(htmlContent, pdfFilePath)
+    
+    // Generate PDF
+    pdfData := PayslipPDFData{
+        Period:               period,
+        Payslip:              payslip,
+        Attendances:          attendances,
+        Overtimes:            overtimes,
+        Reimbursements:       reimbursements,
+        SalaryBaseOnAttended: salaryBaseOnAttended,
+    }
+    err = GeneratePDF(pdfData, pdfFilePath)
     if err != nil {
         return "", err
     }
