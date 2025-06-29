@@ -36,9 +36,9 @@ func (s *attendanceService) CreateAttendance(req CreateAttendanceRequest, userID
     now := time.Now().In(wib)
 
 
-    if now.Weekday() == time.Saturday || now.Weekday() == time.Sunday {
-        return nil, errors.New("attendance cannot be submitted on weekends")
-    }
+    // if now.Weekday() == time.Saturday || now.Weekday() == time.Sunday {
+    //     return nil, errors.New("attendance cannot be submitted on weekends")
+    // }
 
     period, err := s.repo.FindActivePayrollPeriod()
     if err != nil {

@@ -1,19 +1,23 @@
 package payslips
 
-import "time"
+
+import (
+	"time"
+)
 
 type RunPayrollRequest struct {
 	PayrollPeriodID string `json:"payroll_period_id" binding:"required"`
 }
 
 type PayslipResponse struct {
-	ID               string  `json:"id"`
-	UserID           string  `json:"user_id"`
-	PayrollPeriodID  string  `json:"payroll_period_id"`
-	BaseSalary       float64 `json:"base_salary"`
-	OvertimePay      float64 `json:"overtime_pay"`
-	ReimbursementPay float64 `json:"reimbursement_pay"`
-	TotalPay         float64 `json:"total_pay"`
+    ID                    string `json:"id"`
+    UserID                string `json:"user_id"`
+    PayrollPeriodID       string `json:"payroll_period_id"`
+    BaseSalary            string `json:"base_salary"`             
+    SalaryBaseOnAttended  string `json:"salary_base_on_attended"` 
+    OvertimePay           string `json:"overtime_pay"`           
+    ReimbursementPay      string `json:"reimbursement_pay"`      
+	TotalPay              string `json:"total_pay"`             
 }
 
 
@@ -26,7 +30,7 @@ type PayrollPeriod struct {
 
 type User struct {
 	ID         string  `gorm:"type:integer;primaryKey"`
-	BaseSalary float64 `gorm:"type:decimal(15,2);not null"`
+	Salary     float64 `gorm:"column:salary,type:decimal(15,2); not null" json:"salary"`
 }
 
 type Overtime struct {
@@ -39,3 +43,15 @@ type Reimbursement struct {
 	UserID string  `gorm:"type:integer;not null"`
 	Amount float64 `gorm:"type:decimal(15,2);not null"`
 }
+
+type GeneratePayslipRequest struct {
+    PayrollPeriodID string `json:"payroll_period_id" binding:"required"`
+    UserID          string `json:"user_id" binding:"required_if=Role admin"`
+}
+
+type Attendance struct {
+    UserID    string    `gorm:"type:integer;not null"`
+    CheckIn   time.Time `gorm:"type:timestamp;not null"`
+    CheckOut  time.Time `gorm:"type:timestamp"`
+}
+

@@ -17,5 +17,6 @@ func RegisterRoutes(router *gin.Engine, db *gorm.DB, log *logrus.Logger) {
         payslipGroup := routersGroup.Group("payslips")
         payslipGroup.Use(utils.JWTAuthMiddleware())
         payslipGroup.POST("/run", handler.RunPayroll)
+		payslipGroup.POST("/generate", handler.GeneratePayslip)
     }
 }

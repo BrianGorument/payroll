@@ -10,6 +10,7 @@ import (
 	"payroll/src/attendances"
 	"payroll/src/overtimes"
 	"payroll/src/payroll_periods"
+	"payroll/src/payslips"
 	"payroll/src/reimbursements"
 	"payroll/src/users"
 
