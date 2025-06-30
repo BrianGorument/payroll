@@ -190,7 +190,7 @@ Generated on: 29/06/2025
 ## Bantuan
 Jika Anda mengalami kesulitan:
 - Periksa pesan error di terminal dan cari solusi di [Stack Overflow](https://stackoverflow.com).
-- Hubungi saya melalui [GitHub Issues](https://github.com/<username-anda>/payroll-system/issues) atau email di `<email-anda>`.
+- Hubungi saya melalui [GitHub Issues](https://github.com/<username-anda>/payroll-system/issues) atau email di `brianbevine@gmail.com`.
 - Pastikan Go, MySQL, dan dependensi sudah terinstal dengan benar.
 
 Selamat mencoba, dan semoga proyek ini bermanfaat!
